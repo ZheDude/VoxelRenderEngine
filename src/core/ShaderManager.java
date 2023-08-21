@@ -1,9 +1,16 @@
 package core;
 
+import org.joml.Matrix4f;
 import org.lwjgl.opengl.GL30;
+import org.lwjgl.system.MemoryStack;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class ShaderManager {
     private final int programID;
+    private final Map<String, Integer> uniforms;
+
     private int vertexShaderID, fragmentShaderID;
 
     public ShaderManager() throws Exception {
@@ -11,6 +18,7 @@ public class ShaderManager {
         if (programID == 0) {
             throw new Exception("Could not create Shader");
         }
+        uniforms = new HashMap<>();
     }
 
     public void createVertexShader(String shaderCode) throws Exception {
@@ -73,5 +81,17 @@ public class ShaderManager {
         if (uniformLocation < 0) {
             throw new Exception("Could not find uniform:" + uniformName);
         }
+        uniforms.put(uniformName, uniformLocation);
+    }
+
+    public void setUniform(String uniformName, Matrix4f value) {
+        // Dump the matrix into a float buffer
+        try (MemoryStack stack = MemoryStack.stackPush()) {
+            GL30.glUniformMatrix4fv(uniforms.get(uniformName), false, value.get(stack.mallocFloat(16)));
+        }
+    }
+
+    public void setUniform(String uniformName, int value) {
+        GL30.glUniform1i(uniforms.get(uniformName), value);
     }
 }

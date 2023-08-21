@@ -1,8 +1,11 @@
 package core;
 
 import core.Entitiy.Model;
+import core.Entitiy.Texture;
+import core.Utils.Consts;
 import org.lwjgl.glfw.GLFW;
-import org.lwjgl.opengl.GL11;
+
+import static org.lwjgl.opengl.GL46.*;
 
 public class TestGame implements ILogic {
     private int direction = 0;
@@ -23,12 +26,10 @@ public class TestGame implements ILogic {
     public void init() throws Exception {
         renderer.init();
         float[] vertices = {
-                -0.5f, 0.5f, 0f,
-                -0.5f, -0.5f, 0f,
-                0.5f, -0.5f, 0f,
-                0.5f, -0.5f, 0f,
-                0.5f, 0.5f, 0f,
-                -0.5f, 0.5f, 0f
+                -0.5f / Consts.ASPECT_RATIO, 0.5f, 0f,
+                -0.5f / Consts.ASPECT_RATIO, -0.5f, 0f,
+                0.5f / Consts.ASPECT_RATIO, -0.5f, 0f,
+                0.5f / Consts.ASPECT_RATIO, 0.5f, 0f,
         };
 
         int[] indices = {
@@ -36,7 +37,15 @@ public class TestGame implements ILogic {
                 3, 1, 2
         };
 
-        model = loader.loadModel(vertices, indices);
+        float[] textureCoords = {
+                0, 0,
+                0, 1,
+                1, 1,
+                1, 0,
+        };
+
+        model = loader.loadModel(vertices, textureCoords, indices);
+        model.setTexture(new Texture(loader.loadTexture("resources/textures/dirt.png")));
     }
 
     @Override
@@ -63,7 +72,7 @@ public class TestGame implements ILogic {
     @Override
     public void render() {
         if (window.isResize()) {
-            GL11.glViewport(0, 0, window.getWidth(), window.getHeight());
+            glViewport(0, 0, window.getWidth(), window.getHeight());
             window.setResize(true);
         }
 

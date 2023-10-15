@@ -89,8 +89,8 @@ public class WindowManager {
         GL.createCapabilities();
         GL11.glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
         GL11.glEnable(GL20.GL_DEPTH_TEST);
-        GL11.glEnable(GL20.GL_CULL_FACE);
-        GL11.glCullFace(GL20.GL_BACK);
+//        GL11.glEnable(GL20.GL_CULL_FACE);
+//        GL11.glCullFace(GL20.GL_BACK);
         GL11.glEnable(GL20.GL_STENCIL_TEST);
     }
 

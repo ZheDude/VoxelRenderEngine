@@ -20,7 +20,7 @@ public class ObjectLoader {
 
     public Model loadModel(float[] vertices, float[] texturePos, int[] indices) {
         int vaoID = createVAO();
-//        bindIndicesBuffer(vertices);
+//        bindIndicesBuffer(indices);
         storeIndicesBuffer(indices);
         storeDataInAttributeList(0, 3, vertices);
         storeDataInAttributeList(1, 2, texturePos);
@@ -70,7 +70,7 @@ public class ObjectLoader {
     }
 
     private void bindIndicesBuffer(int[] indices) {
-
+        //TODO some stuff (really informative comment)
     }
 
     private void storeDataInAttributeList(int attributeNu, int vertexCount, float[] data) {

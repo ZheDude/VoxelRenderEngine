@@ -18,7 +18,7 @@ public class Camera {
     }
 
 
-    public void movePostition(float x, float y, float z) {
+    public void movePosition(float x, float y, float z) {
         if (z != 0) {
             position.x += (float) Math.sin(Math.toRadians(rotation.y)) * -1.0f * z;
             position.z += (float) Math.cos(Math.toRadians(rotation.y)) * z;

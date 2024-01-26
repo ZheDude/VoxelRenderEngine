@@ -17,7 +17,7 @@ public class Model {
     }
 
     public Model(Model model, Texture texture){
-        this.vaoID = vaoID;
+        this.vaoID = model.vaoID;
         this.vertexCount = model.getVertexCount();
         this.texture = texture;
     }

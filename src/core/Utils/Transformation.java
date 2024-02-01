@@ -1,7 +1,7 @@
 package core.Utils;
 
 import core.Camera;
-import core.Entitiy.Entity;
+import core.Entity.Entity;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 

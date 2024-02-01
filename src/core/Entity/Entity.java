@@ -1,8 +1,6 @@
-package core.Entitiy;
+package core.Entity;
 
 import org.joml.Vector3f;
-
-import java.util.Vector;
 
 public class Entity {
 

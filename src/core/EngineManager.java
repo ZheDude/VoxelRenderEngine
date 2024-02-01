@@ -113,6 +113,10 @@ public class EngineManager {
         GLFW.glfwTerminate();
     }
 
+    public static float getFrameTime() {
+        return FrameTime;
+    }
+
     public static int getFps() {
         return fps;
     }

@@ -1,9 +1,10 @@
 package core;
 
-import core.Entitiy.Entity;
-import core.Entitiy.Model;
+import core.Entity.Entity;
 import core.Utils.Transformation;
 import core.Utils.Utils;
+
+import java.util.List;
 
 import static org.lwjgl.opengl.GL46.*;
 
@@ -26,26 +27,29 @@ public class RenderManager {
         shader.createUniform("viewMatrix");
     }
 
-    public void render(Entity entity, Camera camera) {
+    public void render(List<Entity> entity, Camera camera) {
         clear();
-        shader.bind();
-        shader.setUniform("textureSampler", 0);
-        shader.setUniform("transformationMatrix", Transformation.createTransformationMatrix(entity));
-        shader.setUniform("projectionMatrix", window.updateProjectionMatrix());
-        shader.setUniform("viewMatrix", Transformation.getViewMatrix(camera));
-        glBindVertexArray(entity.getModel().getVaoID());
-        glEnableVertexAttribArray(0);
-        glEnableVertexAttribArray(1);
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, entity.getModel().getTexture().getID());
-        glDrawElements(GL_TRIANGLES,  entity.getModel().getVertexCount(), GL_UNSIGNED_INT, 0);
-        glDisableVertexAttribArray(0);glDisableVertexAttribArray(1);
-        glBindVertexArray(0);
-        shader.unbind();
+        for (Entity e : entity) {
+            shader.bind();
+            shader.setUniform("textureSampler", 0);
+            shader.setUniform("transformationMatrix", Transformation.createTransformationMatrix(e));
+            shader.setUniform("projectionMatrix", window.updateProjectionMatrix());
+            shader.setUniform("viewMatrix", Transformation.getViewMatrix(camera));
+            glBindVertexArray(e.getModel().getVaoID());
+            glEnableVertexAttribArray(0);
+            glEnableVertexAttribArray(1);
+            glActiveTexture(GL_TEXTURE0);
+            glBindTexture(GL_TEXTURE_2D, e.getModel().getTexture().getID());
+            glDrawElements(GL_TRIANGLES, e.getModel().getVertexCount(), GL_UNSIGNED_INT, 0);
+            glDisableVertexAttribArray(0);
+            glDisableVertexAttribArray(1);
+            glBindVertexArray(0);
+            shader.unbind();
+        }
     }
 
     public void clear() {
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
     }
 
     public void cleanUp() {

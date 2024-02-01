@@ -1,4 +1,4 @@
-package core.Entitiy;
+package core.Entity;
 
 public class Texture {
     private final int id;

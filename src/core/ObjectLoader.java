@@ -1,6 +1,6 @@
 package core;
 
-import core.Entitiy.Model;
+import core.Entity.Model;
 import core.Utils.Utils;
 import org.lwjgl.opengl.GL30;
 import org.lwjgl.stb.STBImage;

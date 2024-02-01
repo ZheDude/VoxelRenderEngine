@@ -9,7 +9,7 @@ public class Main {
 
     public static void main(String[] args) {
         System.out.println("Hello world!");
-        window = new WindowManager(TITLE, 1280, 720, true);
+        window = new WindowManager(TITLE, 1280, 720, false);
         game = new TestGame();
         EngineManager engine = new EngineManager();
 

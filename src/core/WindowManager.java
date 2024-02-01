@@ -5,9 +5,8 @@ import org.joml.Matrix4f;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.glfw.GLFWVidMode;
 import org.lwjgl.opengl.GL;
-import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL20;
 
+import static org.lwjgl.opengl.GL46.*;
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.system.MemoryUtil.NULL;
 import static core.Utils.Consts.*;
@@ -87,11 +86,15 @@ public class WindowManager {
         glfwShowWindow(window);
 
         GL.createCapabilities();
-        GL11.glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-        GL11.glEnable(GL20.GL_DEPTH_TEST);
-//        GL11.glEnable(GL20.GL_CULL_FACE);
-//        GL11.glCullFace(GL20.GL_BACK);
-        GL11.glEnable(GL20.GL_STENCIL_TEST);
+        glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+        glEnable(GL_DEPTH_TEST);
+//        glDepthFunc(GL_LEQUAL);
+        glEnable(GL_CULL_FACE);
+        glCullFace(GL_BACK);
+        glFrontFace(GL_CCW);
+        glEnable(GL_STENCIL_TEST);
+        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+        glfwSetCursorPosCallback(window, TestGame::mouse_callback);
     }
 
 
@@ -105,7 +108,7 @@ public class WindowManager {
     }
 
     public void setClearColor(float r, float g, float b, float alpha) {
-        GL11.glClearColor(r, g, b, alpha);
+        glClearColor(r, g, b, alpha);
     }
 
     public boolean isKeyPressed(int keyCode) {

@@ -1,10 +1,12 @@
 package core;
 
-import core.Entitiy.Entity;
-import core.Entitiy.Model;
-import core.Entitiy.Texture;
+import BlockData.Cube;
+import core.Entity.Entity;
 import org.joml.Vector3f;
 import org.lwjgl.glfw.GLFW;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.lwjgl.opengl.GL46.*;
 
@@ -15,154 +17,106 @@ public class TestGame implements ILogic {
     private final RenderManager renderer;
     private final WindowManager window;
     private final ObjectLoader loader;
-    private Entity entity;
-    private Camera camera;
-    private float entityZ;
+    private final List<Entity> entity = new ArrayList<>();
+    private static Camera camera;
 
+    private static float sensitivity = 0.1f;
     Vector3f cameraInc;
+
+    static double lastX, lastY, yaw, pitch;
+    static boolean firstMouse = true;
 
     public TestGame() {
         renderer = new RenderManager();
         window = Main.getWindow();
         loader = new ObjectLoader();
         camera = new Camera();
+        camera.setPosition(-5, 3, 10);
         cameraInc = new Vector3f(0, 0, 0);
+        lastX = window.getWidth() / 2.0f;
+        lastY = window.getHeight() / 2.0f;
+    }
+
+
+    public static void mouse_callback(long window, double xpos, double ypos) {
+        if (firstMouse) {
+            lastX = xpos;
+            lastY = ypos;
+            firstMouse = false;
+        }
+        double xoffset = xpos - lastX;
+        double yoffset = lastY - ypos;
+        lastX = xpos;
+        lastY = ypos;
+
+        xoffset *= sensitivity;
+        yoffset *= sensitivity;
+
+        yaw += xoffset;
+        pitch -= yoffset;
+
+        if (pitch > 89.0f)
+            pitch = 89.0f;
+        if (pitch < -89.0f)
+            pitch = -89.0f;
+
+        System.out.println("xpos = " + xpos);
+        System.out.println("ypos = " + ypos);
+        System.out.println("xoffset = " + xoffset);
+        System.out.println("yoffset = " + yoffset);
+        System.out.println("yaw = " + yaw);
+        System.out.println("pitch = " + pitch);
+        System.out.println("lastX = " + lastX);
+        System.out.println("lastY = " + lastY);
+        camera.setRotation((float) pitch, (float) yaw, 0.0f);
     }
 
     @Override
     public void init() throws Exception {
         renderer.init();
 
-        float[] vertices = new float[]{
-                // front face
-                -0.5f, 0.5f, 0.5f, // 0 top left
-                -0.5f, -0.5f, 0.5f, // 1 bottom left
-                0.5f, -0.5f, 0.5f, // 2 bottom right
-                0.5f, 0.5f, 0.5f, // 3 top right
 
-                // back face
-                -0.5f, 0.5f, -0.5f, // 4 top left
-                -0.5f, -0.5f, -0.5f, // 5 bottom left
-                0.5f, -0.5f, -0.5f, // 6 bottom right
-                0.5f, 0.5f, -0.5f, // 7 top right
+        for (int i = 0; i < 10; i++) {
+            for (int j = 0; j < 10; j++) {
+                for (int k = -1; k < 64; k++) {
+                    Cube c = new Cube(loader, new Vector3f(i, k, -j), new Vector3f(0, 0, 0), 1);
+                    entity.add(c.generateEntity());
+                }
+            }
+        }
 
-                //right face
-                0.5f, 0.5f, 0.5f, // 8 top left
-                0.5f, -0.5f, 0.5f, // 9 bottom left
-                0.5f, -0.5f, -0.5f, // 10 bottom right
-                0.5f, 0.5f, -0.5f, // 11 top right
-
-                //left face
-                -0.5f, 0.5f, 0.5f, // 12 top left
-                -0.5f, -0.5f, 0.5f, // 13 bottom left
-                -0.5f, -0.5f, -0.5f, // 14 bottom right
-                -0.5f, 0.5f, -0.5f, // 15 top right
-
-                //top face
-                -0.5f, 0.5f, 0.5f, // 16 top left
-                -0.5f, 0.5f, -0.5f, // 17 bottom left
-                0.5f, 0.5f, -0.5f, // 18 bottom right
-                0.5f, 0.5f, 0.5f, // 19 top right
-
-                //bottom face
-                -0.5f, -0.5f, 0.5f, // 20 top left
-                -0.5f, -0.5f, -0.5f, // 21 bottom left
-                0.5f, -0.5f, -0.5f, // 22 bottom right
-                0.5f, -0.5f, 0.5f, // 23 top right
-        };
-
-        // look into java OBJ parser
-        int[] indices = new int[]{
-                0, 1, 3, 3, 1, 2, // front face
-                4, 5, 7, 7, 5, 6, // back face
-                8, 9, 11, 11, 9, 10, // right face
-                12, 13, 15, 15, 13, 14, // left face
-                16, 17, 19, 19, 17, 18, // top face
-                20, 21, 23, 23, 21, 22, // bottom face
-        };
-
-        float[] textCoords = new float[]{
-                //format
-                //x, y
-
-                //front face
-                0.0f, 0.0f,
-                0.0f, 1.0f,
-                1.0f, 1.0f,
-                1.0f, 0.0f,
-
-                //back face
-                1.0f, 0.0f,
-                1.0f, 1.0f,
-                0.0f, 1.0f,
-                0.0f, 0.0f,
-
-                //right face
-                0.0f, 0.0f,
-                0.0f, 1.0f,
-                1.0f, 1.0f,
-                1.0f, 0.0f,
-
-                //left face
-                1.0f, 0.0f,
-                1.0f, 1.0f,
-                0.0f, 1.0f,
-                0.0f, 0.0f,
-
-                //top face
-                0.0f, 1.0f,
-                0.0f, 0.0f,
-                1.0f, 0.0f,
-                1.0f, 1.0f,
-
-                //bottom face
-                1.0f, 1.0f,
-                1.0f, 0.0f,
-                0.0f, 0.0f,
-                0.0f, 1.0f
-
-        };
-
-        Model model = loader.loadModel(vertices, textCoords, indices);
-        model.setTexture(new Texture(loader.loadTexture("resources/textures/dirt.png")));
-        entity = new Entity(model, new Vector3f(0, 0,  -5), new Vector3f(0, 0, 0), 1);
     }
 
     @Override
     public void input() {
         cameraInc.set(0, 0, 0);
         if (window.isKeyPressed(GLFW.GLFW_KEY_W)) {
-            cameraInc.z = -1;
+            cameraInc.z = -100;
         }
         if (window.isKeyPressed(GLFW.GLFW_KEY_S)) {
-            cameraInc.z = 1;
+            cameraInc.z = 100;
         }
         if (window.isKeyPressed(GLFW.GLFW_KEY_A)) {
-            cameraInc.x = -1;
+            cameraInc.x = -100;
         }
         if (window.isKeyPressed(GLFW.GLFW_KEY_D)) {
-            cameraInc.x = 1;
+            cameraInc.x = 100;
         }
         if (window.isKeyPressed(GLFW.GLFW_KEY_LEFT_CONTROL)) {
-            cameraInc.y = -1;
+            cameraInc.y = -100;
         }
         if (window.isKeyPressed(GLFW.GLFW_KEY_SPACE)) {
-            cameraInc.y = 1;
-        }
-        if (window.isKeyPressed(GLFW.GLFW_KEY_LEFT_SHIFT)) {
-            entityZ = 0.5f;
-        }
-        if (window.isKeyPressed(GLFW.GLFW_KEY_LEFT_ALT)) {
-            entityZ = 0;
+            cameraInc.y = 100;
         }
     }
 
     @Override
     public void update() {
-        camera.movePosition(cameraInc.x * CAMERA_MOVE_SPEED,
-                cameraInc.y * CAMERA_MOVE_SPEED,
-                cameraInc.z * CAMERA_MOVE_SPEED);
-        entity.incRotation(0.0f, entityZ, 0.0f);
+        float frameTime = EngineManager.getFrameTime();
+        camera.movePosition(cameraInc.x * CAMERA_MOVE_SPEED * frameTime,
+                cameraInc.y * CAMERA_MOVE_SPEED * frameTime,
+                cameraInc.z * CAMERA_MOVE_SPEED * frameTime);
+        entity.forEach(e -> e.incRotation(0.0f, 0.0f, 0.0f));
     }
 
     @Override

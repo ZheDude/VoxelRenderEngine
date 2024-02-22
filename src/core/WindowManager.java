@@ -95,6 +95,7 @@ public class WindowManager {
         glEnable(GL_STENCIL_TEST);
         glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
         glfwSetCursorPosCallback(window, TestGame::mouse_callback);
+        glfwSetMouseButtonCallback(window, TestGame::mouse_button_callback);
     }
 
 

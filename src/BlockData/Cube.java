@@ -6,6 +6,11 @@ import core.Entity.Texture;
 import core.ObjectLoader;
 import org.joml.Vector3f;
 
+import java.sql.SQLOutput;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+
 public class Cube {
 
     private final ObjectLoader loader;
@@ -102,5 +107,43 @@ public class Cube {
         Model model = loader.loadModel(vertices, textCoords, indices);
         model.setTexture(new Texture(loader.loadTexture("resources/textures/dirt.png")));
         return new Entity(model, pos, rotation, scale);
+    }
+
+    public int getNeighbour(List<Cube> allCubes) {
+        System.out.println(this.pos);
+        int neighbourCount = 0;
+
+        //generate the coordinates of the 6 neighbors of each face
+        Vector3f[] neighbours = new Vector3f[]{
+                new Vector3f(this.pos.x, this.pos.y, this.pos.z + 1), //front face
+                new Vector3f(this.pos.x, this.pos.y, this.pos.z - 1), //back face
+                new Vector3f(this.pos.x + 1, this.pos.y, this.pos.z), //right face
+                new Vector3f(this.pos.x - 1, this.pos.y, this.pos.z), //left face
+                new Vector3f(this.pos.x, this.pos.y + 1, this.pos.z), //top face
+                new Vector3f(this.pos.x, this.pos.y - 1, this.pos.z), //bottom face
+        };
+
+        //check if the coordinates are in the list of all cubes
+        for (Vector3f neighbour : neighbours) {
+            for (Cube cube : allCubes) {
+                if (cube.pos.equals(neighbour)) {
+                    neighbourCount++;
+                }
+            }
+        }
+        return neighbourCount;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Cube cube = (Cube) o;
+        return Objects.equals(pos, cube.pos);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(pos);
     }
 }

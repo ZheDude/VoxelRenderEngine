@@ -27,9 +27,12 @@ public class RenderManager {
         shader.createUniform("viewMatrix");
     }
 
-    public void render(List<Entity> entity, Camera camera) {
+    public void renderCubes(List<Entity> entity, Camera camera) {
         clear();
         for (Entity e : entity) {
+            if (e.getNeighbour(entity) == 6) {
+                continue;
+            }
             shader.bind();
             shader.setUniform("textureSampler", 0);
             shader.setUniform("transformationMatrix", Transformation.createTransformationMatrix(e));

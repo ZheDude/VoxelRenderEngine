@@ -2,7 +2,6 @@ package core;
 
 import core.Entity.Model;
 import core.Utils.Utils;
-import org.lwjgl.opengl.GL30;
 import org.lwjgl.stb.STBImage;
 import org.lwjgl.system.MemoryStack;
 
@@ -11,6 +10,8 @@ import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.ArrayList;
 import java.util.List;
+
+import static org.lwjgl.opengl.GL46.*;
 
 public class ObjectLoader {
     private List<Integer> VAOs = new ArrayList<>();
@@ -43,31 +44,31 @@ public class ObjectLoader {
             width = w.get();
             height = h.get();
         }
-        int id = GL30.glGenTextures();
+        int id = glGenTextures();
         textures.add(id);
-        GL30.glBindTexture(GL30.GL_TEXTURE_2D, id);
-        GL30.glPixelStorei(GL30.GL_UNPACK_ALIGNMENT, 1);
-//        GL30.glTexParameteri(GL30.GL_TEXTURE_2D, GL30.GL_TEXTURE_WRAP_S, GL30.GL_REPEAT);
-//        GL30.glTexParameteri(GL30.GL_TEXTURE_2D, GL30.GL_TEXTURE_WRAP_S, GL30.GL_REPEAT);
-        GL30.glTexParameteri(GL30.GL_TEXTURE_2D, GL30.GL_TEXTURE_MIN_FILTER, GL30.GL_NEAREST);
-        GL30.glTexParameteri(GL30.GL_TEXTURE_2D, GL30.GL_TEXTURE_MAG_FILTER, GL30.GL_NEAREST);
-        GL30.glTexImage2D(GL30.GL_TEXTURE_2D, 0, GL30.GL_RGBA, width, height, 0, GL30.GL_RGBA, GL30.GL_UNSIGNED_BYTE, buffer);
-        GL30.glBindTexture(GL30.GL_TEXTURE_2D, 0);
-        GL30.glGenerateMipmap(GL30.GL_TEXTURE_2D);
+        glBindTexture(GL_TEXTURE_2D, id);
+        glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+//        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+//        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, buffer);
+        glBindTexture(GL_TEXTURE_2D, 0);
+        glGenerateMipmap(GL_TEXTURE_2D);
         STBImage.stbi_image_free(buffer);
         return id;
     }
 
     private void unbind() {
-        GL30.glBindVertexArray(0);
+        glBindVertexArray(0);
     }
 
     private void storeIndicesBuffer(int[] indices) {
-        int vboID = GL30.glGenBuffers();
+        int vboID = glGenBuffers();
         VBOs.add(vboID);
-        GL30.glBindBuffer(GL30.GL_ELEMENT_ARRAY_BUFFER, vboID);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vboID);
         IntBuffer buffer = Utils.storeDataInIntBuffer(indices);
-        GL30.glBufferData(GL30.GL_ELEMENT_ARRAY_BUFFER, buffer, GL30.GL_STATIC_DRAW);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, buffer, GL_STATIC_DRAW);
     }
 
     private void bindIndicesBuffer(int[] indices) {
@@ -75,31 +76,31 @@ public class ObjectLoader {
     }
 
     private void storeDataInAttributeList(int attributeNu, int vertexCount, float[] data) {
-        int vboID = GL30.glGenBuffers();
+        int vboID = glGenBuffers();
         VBOs.add(vboID);
-        GL30.glBindBuffer(GL30.GL_ARRAY_BUFFER, vboID);
+        glBindBuffer(GL_ARRAY_BUFFER, vboID);
         FloatBuffer buffer = Utils.storeDataInFloatBuffer(data);
-        GL30.glBufferData(GL30.GL_ARRAY_BUFFER, buffer, GL30.GL_STATIC_DRAW);
-        GL30.glVertexAttribPointer(attributeNu, vertexCount, GL30.GL_FLOAT, false, 0, 0);
-        GL30.glBindBuffer(GL30.GL_ARRAY_BUFFER, 0);
+        glBufferData(GL_ARRAY_BUFFER, buffer, GL_STATIC_DRAW);
+        glVertexAttribPointer(attributeNu, vertexCount, GL_FLOAT, false, 0, 0);
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
     }
 
     public void cleanUp() {
         for (int vao : VAOs) {
-            GL30.glDeleteVertexArrays(vao);
+            glDeleteVertexArrays(vao);
         }
         for (int vbo : VBOs) {
-            GL30.glDeleteBuffers(vbo);
+            glDeleteBuffers(vbo);
         }
         for (int texture : textures) {
-            GL30.glDeleteTextures(texture);
+            glDeleteTextures(texture);
         }
     }
 
     private int createVAO() {
-        int vaoID = GL30.glGenVertexArrays();
+        int vaoID = glGenVertexArrays();
         VAOs.add(vaoID);
-        GL30.glBindVertexArray(vaoID);
+        glBindVertexArray(vaoID);
         return vaoID;
     }
 }

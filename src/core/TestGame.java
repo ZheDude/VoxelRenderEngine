@@ -2,6 +2,8 @@ package core;
 
 import BlockData.Cube;
 import core.Entity.Entity;
+import core.Entity.RayEntity;
+import core.Utils.OctreeNode;
 import core.Utils.RayCasting;
 import org.joml.Vector3f;
 import org.lwjgl.glfw.GLFW;
@@ -20,8 +22,9 @@ public class TestGame implements ILogic {
     private final WindowManager window;
     private static ObjectLoader loader;
     private static final List<Entity> entities = new ArrayList<>();
+    private static List<RayEntity> rayEntities = new ArrayList<>();
     private static Camera camera;
-
+    private static OctreeNode root;
     private static float sensitivity = 0.1f;
     Vector3f cameraInc;
 
@@ -64,28 +67,39 @@ public class TestGame implements ILogic {
         camera.setRotation((float) pitch, (float) yaw, 0.0f);
     }
 
+    static Vector3f minCorner = new Vector3f(-100, -100, -100); // Adjust these values as needed
+    static  Vector3f maxCorner = new Vector3f(100, 100, 100); // Adjust these values as needed
+
     public static void mouse_button_callback(long window, int button, int action, int mods) {
-        if (button == GLFW_MOUSE_BUTTON_1 && action == GLFW_PRESS) {
+        if ((button == GLFW_MOUSE_BUTTON_1 || button == GLFW_MOUSE_BUTTON_2) && action == GLFW_PRESS) {
             // I need to figure out how to get the block that the mouse is pointing at
-            RayCasting rayCasting = new RayCasting();
+            int maxRange = 5;
+            RayCasting rayCasting = new RayCasting(maxRange);
             Vector3f ray = rayCasting.calculateRay(Main.getWindow(), camera);
-//                System.out.println(ray);
-            for (Entity entity : entities) {
-                if (rayCasting.isIntersecting(ray, entity)) {
-                    // The middle of the screen is looking at this entity
-                    Vector3f entityPosition = entity.getPos();
-                    System.out.println(entityPosition);
-                    try {
-                        Cube c = new Cube(loader, new Vector3f(entityPosition), new Vector3f(0, 0, 0), 1);
-                        entities.remove(c.generateEntity());
-                    } catch (Exception e) {
-                        throw new RuntimeException(e);
+            RayEntity rayEntity = new RayEntity(loader, new Vector3f(0, 0, 0), new Vector3f(0, 0, 0), maxRange);
+            rayEntity.setOrigin(rayCasting.getRayOrigin());
+            rayEntity.setDirection(rayCasting.getRayDirection());
+            rayEntities.clear();
+            rayEntities.add(rayEntity);
+            System.out.println(rayCasting);
+
+            Entity closestEntity = root.intersectRay(rayCasting.getRayOrigin(), rayCasting.getRayDirection());
+            if (closestEntity != null) {
+                Vector3f entityPosition = closestEntity.getPos();
+                System.out.println(entityPosition);
+                try {
+                    Cube c = new Cube(loader, new Vector3f(entityPosition), new Vector3f(0, 0, 0), 1);
+                    entities.remove(c.generateEntity());
+
+                    // Rebuild the Octree
+                    root = new OctreeNode(minCorner, maxCorner, new ArrayList<>());
+                    for (Entity entity : entities) {
+                        root.addEntity(entity);
                     }
-                    break;
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
                 }
             }
-            System.out.println("Origin " + rayCasting.getRayOrigin());
-            System.out.println("Direction: " + rayCasting.getRayDirection());
         }
 
     }
@@ -93,15 +107,22 @@ public class TestGame implements ILogic {
     @Override
     public void init() throws Exception {
         renderer.init();
+        root = new OctreeNode(minCorner, maxCorner, new ArrayList<>());
 
-        for (int i = 0; i < 10; i++) {
-            for (int j = 0; j < 10; j++) {
-                for (int k = 0; k < 5; k++) {
+        // Populate the Octree with entities
+        for (int i = 0; i < 31; i++) {
+            for (int j = 0; j < 31;  j++) {
+                for (int k = 0; k < 31; k++) {
                     Cube c = new Cube(loader, new Vector3f(i, k, -j), new Vector3f(0, 0, 0), 1);
-                    entities.add(c.generateEntity());
+                    Entity entity = c.generateEntity();
+                    entities.add(entity);
+                    root.addEntity(entity);
                 }
             }
         }
+
+        // Subdivide the Octree
+        root.subdivide();
     }
 
     @Override
@@ -147,6 +168,7 @@ public class TestGame implements ILogic {
         window.setClearColor(0.0f, 0.0f, 0.0f, 0.0f);
         renderer.clear();
         renderer.renderCubes(entities, camera);
+        renderer.renderRays(rayEntities, camera);
     }
 
     @Override

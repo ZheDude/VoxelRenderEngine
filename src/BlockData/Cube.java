@@ -56,7 +56,6 @@ public class Cube {
             0.5f, -0.5f, 0.5f, // 23 top right
     };
 
-    // look into java OBJ parser
     int[] indices = new int[]{
             4, 7, 5, 7, 6, 5, // back face
             8, 9, 11, 11, 9, 10, // right face
@@ -65,6 +64,26 @@ public class Cube {
             20, 21, 23, 23, 21, 22, // bottom face
             0, 1, 3, 3, 1, 2, // front face
     };
+
+//    float[] vertices = new float[]{
+//            -0.5f, -0.5f, -0.5f, // 0: bottom-left-back
+//            0.5f, -0.5f, -0.5f, // 1: bottom-right-back
+//            -0.5f, 0.5f, -0.5f, // 2: top-left-back
+//            0.5f, 0.5f, -0.5f, // 3: top-right-back
+//            -0.5f, -0.5f, 0.5f, // 4: bottom-left-front
+//            0.5f, -0.5f, 0.5f, // 5: bottom-right-front
+//            -0.5f, 0.5f, 0.5f, // 6: top-left-front
+//            0.5f, 0.5f, 0.5f, // 7: top-right-front
+//    };
+//
+//    int[] indices = new int[]{
+//            0, 2, 1, 1, 2, 3, // back face
+//            4, 5, 6, 5, 7, 6, // front face
+//            0, 4, 2, 2, 4, 6, // left face
+//            1, 3, 5, 3, 7, 5, // right face
+//            2, 6, 3, 3, 6, 7, // top face
+//            0, 1, 4, 1, 5, 4  // bottom face
+//    };
 
     float[] textCoords = new float[]{
             //format

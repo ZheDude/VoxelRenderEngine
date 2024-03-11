@@ -1,5 +1,6 @@
 package core;
 
+import BlockData.BlockType;
 import BlockData.Cube;
 import core.Entity.Entity;
 import core.Entity.RayEntity;
@@ -68,7 +69,7 @@ public class TestGame implements ILogic {
     }
 
     static Vector3f minCorner = new Vector3f(-100, -100, -100); // Adjust these values as needed
-    static  Vector3f maxCorner = new Vector3f(100, 100, 100); // Adjust these values as needed
+    static Vector3f maxCorner = new Vector3f(100, 100, 100); // Adjust these values as needed
 
     public static void mouse_button_callback(long window, int button, int action, int mods) {
         if ((button == GLFW_MOUSE_BUTTON_1 || button == GLFW_MOUSE_BUTTON_2) && action == GLFW_PRESS) {
@@ -87,18 +88,9 @@ public class TestGame implements ILogic {
             if (closestEntity != null) {
                 Vector3f entityPosition = closestEntity.getPos();
                 System.out.println(entityPosition);
-                try {
-                    Cube c = new Cube(loader, new Vector3f(entityPosition), new Vector3f(0, 0, 0), 1);
-                    entities.remove(c.generateEntity());
-
-                    // Rebuild the Octree
-                    root = new OctreeNode(minCorner, maxCorner, new ArrayList<>());
-                    for (Entity entity : entities) {
-                        root.addEntity(entity);
-                    }
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
-                }
+                entities.remove(closestEntity);
+                // Rebuild the Octree
+                root = new OctreeNode(minCorner, maxCorner, entities);
             }
         }
 
@@ -109,14 +101,17 @@ public class TestGame implements ILogic {
         renderer.init();
         root = new OctreeNode(minCorner, maxCorner, new ArrayList<>());
 
+        BlockType blockType = BlockType.GLASS;
+
         // Populate the Octree with entities
-        for (int i = 0; i < 31; i++) {
-            for (int j = 0; j < 31;  j++) {
-                for (int k = 0; k < 31; k++) {
-                    Cube c = new Cube(loader, new Vector3f(i, k, -j), new Vector3f(0, 0, 0), 1);
+        for (int i = 0; i < 20; i++) {
+            for (int j = 0; j < 20; j++) {
+                for (int k = 0; k < 20; k++) {
+                    Cube c = new Cube(loader, new Vector3f(i, k, -j), new Vector3f(0, 0, 0), 1, blockType);
                     Entity entity = c.generateEntity();
                     entities.add(entity);
                     root.addEntity(entity);
+                    blockType = blockType == BlockType.GLASS ? BlockType.DIRT : BlockType.GLASS;
                 }
             }
         }
@@ -146,6 +141,12 @@ public class TestGame implements ILogic {
         if (window.isKeyPressed(GLFW.GLFW_KEY_SPACE)) {
             cameraInc.y = 100;
         }
+        if (window.isKeyPressed(GLFW_KEY_B)) {
+            glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+        }
+        if (window.isKeyPressed(GLFW_KEY_N)) {
+            glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+        }
     }
 
 
@@ -167,7 +168,26 @@ public class TestGame implements ILogic {
 
         window.setClearColor(0.0f, 0.0f, 0.0f, 0.0f);
         renderer.clear();
-        renderer.renderCubes(entities, camera);
+        // Sort entities based on distance from camera
+        entities.sort((e1, e2) -> {
+            float dist1 = camera.getPosition().distance(e1.getPos());
+            float dist2 = camera.getPosition().distance(e2.getPos());
+            return Float.compare(dist2, dist1); // Draw farthest entities first
+        });
+
+        // Draw opaque entities first
+        for (Entity entity : entities) {
+            if (!entity.isTransparent()) {
+                renderer.renderCubes(entity, camera);
+            }
+        }
+
+        // Draw transparent entities last
+        for (Entity entity : entities) {
+            if (entity.isTransparent()) {
+                renderer.renderCubes(entity, camera);
+            }
+        }
         renderer.renderRays(rayEntities, camera);
     }
 

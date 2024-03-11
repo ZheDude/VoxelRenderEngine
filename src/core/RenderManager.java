@@ -29,30 +29,30 @@ public class RenderManager {
         shader.createUniform("viewMatrix");
     }
 
-    public void renderCubes(List<Entity> entity, Camera camera) {
-        clear();
+    public void renderCubes(Entity e, Camera camera) {
+//        clear();
         shader.bind();
         shader.setUniform("textureSampler", 0);
         shader.setUniform("projectionMatrix", window.updateProjectionMatrix());
         shader.setUniform("viewMatrix", Transformation.getViewMatrix(camera));
-        for (Entity e : entity) {
-            shader.setUniform("transformationMatrix", Transformation.createTransformationMatrix(e));
-            glBindVertexArray(e.getModel().getVaoID());
-            glEnableVertexAttribArray(0);
-            glEnableVertexAttribArray(1);
-            glActiveTexture(GL_TEXTURE0);
-            glBindTexture(GL_TEXTURE_2D, e.getModel().getTexture().getID());
-            glDrawElements(GL_TRIANGLES, e.getModel().getVertexCount(), GL_UNSIGNED_INT, 0);
+//        for (Entity e : entity) {
+        shader.setUniform("transformationMatrix", Transformation.createTransformationMatrix(e));
+        glBindVertexArray(e.getModel().getVaoID());
+        glEnableVertexAttribArray(0);
+        glEnableVertexAttribArray(1);
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, e.getModel().getTexture().getID());
+        glDrawElements(GL_TRIANGLES, e.getModel().getVertexCount(), GL_UNSIGNED_INT, 0);
 //            glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 //            glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 6 * Integer.BYTES); // front face
 //            glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 12 * Integer.BYTES); // left face
 //            glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 18 * Integer.BYTES); // right face
 //            glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 24 * Integer.BYTES); // top face
 //            glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 30 * Integer.BYTES); // bottom face
-            glDisableVertexAttribArray(0);
-            glDisableVertexAttribArray(1);
-            glBindVertexArray(0);
-        }
+        glDisableVertexAttribArray(0);
+        glDisableVertexAttribArray(1);
+        glBindVertexArray(0);
+//        }
         shader.unbind();
     }
 

@@ -11,11 +11,14 @@ public class Entity {
     private Vector3f pos, rotation;
     private float scale;
 
-    public Entity(Model model, Vector3f pos, Vector3f rotation, float scale) {
+    private boolean transparent;
+
+    public Entity(Model model, Vector3f pos, Vector3f rotation, float scale, boolean transparent) {
         this.model = model;
         this.pos = pos;
         this.rotation = rotation;
         this.scale = scale;
+        this.transparent = transparent;
     }
 
 
@@ -197,5 +200,9 @@ public class Entity {
     @Override
     public int hashCode() {
         return Objects.hash(pos);
+    }
+
+    public boolean isTransparent() {
+        return transparent;
     }
 }

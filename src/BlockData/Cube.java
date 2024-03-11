@@ -17,6 +17,7 @@ public class Cube {
     private final Vector3f pos;
     private final Vector3f rotation;
     private final float scale;
+    private BlockType blocktype;
 
     float[] vertices = new float[]{
             // front face
@@ -109,11 +110,12 @@ public class Cube {
 
     };
 
-    public Cube(ObjectLoader loader, Vector3f pos, Vector3f rotation, float scale) throws Exception {
+    public Cube(ObjectLoader loader, Vector3f pos, Vector3f rotation, float scale, BlockType blocktype) throws Exception {
         this.loader = loader;
         this.pos = pos;
         this.rotation = rotation;
         this.scale = scale;
+        this.blocktype = blocktype;
     }
 
     public void setPos(float x, float y, float z) {
@@ -124,8 +126,8 @@ public class Cube {
 
     public Entity generateEntity() throws Exception {
         Model model = loader.loadModel(vertices, textCoords, indices);
-        model.setTexture(new Texture(loader.loadTexture("resources/textures/dirt.png")));
-        return new Entity(model, pos, rotation, scale);
+        model.setTexture(new Texture(loader.loadTexture(blocktype.getTexturePath())));
+        return new Entity(model, pos, rotation, scale, blocktype.isTransparent());
     }
 
     public int getNeighbour(List<Cube> allCubes) {

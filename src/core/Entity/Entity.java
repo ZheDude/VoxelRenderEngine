@@ -222,7 +222,7 @@ public class Entity {
 //            System.out.println("Entity " + c);
 //            System.out.println(entity.getPos() + " - " + new Vector3f(this.getPos()).add(vector3f));
 //            System.out.println(entity.getPos().equals(new Vector3f(this.getPos()).add(vector3f)));
-            if ((entity.getPos() == new Vector3f(this.getPos()).add(vector3f)) && entity.blockType.equals(this.blockType)) {
+            if (entity.getPos().equals(new Vector3f(this.getPos()).add(vector3f)) && entity.blockType.equals(this.blockType)) {
 //                System.out.println(entity.getPos() + " - " + new Vector3f(this.getPos()).add(vector3f));
                 return true;
             }

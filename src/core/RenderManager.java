@@ -51,22 +51,22 @@ public class RenderManager {
             glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 12 * Integer.BYTES); // left face
         }
         if (!e.isNeighborSameType(new Vector3f(0, 1, 0))) {
-//            System.out.println("+x");
+//            System.out.println("+y");
             glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 18 * Integer.BYTES); // top face
         }
-        if (!e.isNeighborSameType(new Vector3f(0, 0, -1))) {
-//            System.out.println("-y");
+        if (!e.isNeighborSameType(new Vector3f(0, 0, 1))) {
+//            System.out.println("-z");
             glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 30 * Integer.BYTES); // front face
         }
         if (!e.isNeighborSameType(new Vector3f(0, -1, 0))) {
-//            System.out.println("+y");
+//            System.out.println("-y");
             glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 24 * Integer.BYTES); // bottom face
         }
         if (!e.isNeighborSameType(new Vector3f(1, 0, 0))) {
-//            System.out.println("-z");
+//            System.out.println("+x");
             glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 6 * Integer.BYTES); // right face
         }
-        if (!e.isNeighborSameType(new Vector3f(0, 0, 1))) {
+        if (!e.isNeighborSameType(new Vector3f(0, 0, -1))) {
 //            System.out.println("+z");
             glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0); // back face
         }

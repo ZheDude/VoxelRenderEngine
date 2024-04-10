@@ -158,9 +158,9 @@ public class TestGame implements ILogic {
         BlockType blockType = BlockType.GLASS;
 
         // Populate the Octree with entities
-        for (int i = 0; i < 2; i++) {
-            for (int j = 0; j < 2; j++) {
-                for (int k = 0; k < 2; k++) {
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                for (int k = 0; k < 3; k++) {
                     Cube c = new Cube(loader, new Vector3f(i, k, -j), new Vector3f(0, 0, 0), 1, blockType);
                     Entity entity = c.generateEntity();
                     entities.add(entity);

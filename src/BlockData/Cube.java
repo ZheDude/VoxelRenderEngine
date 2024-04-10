@@ -127,7 +127,7 @@ public class Cube {
     public Entity generateEntity() throws Exception {
         Model model = loader.loadModel(vertices, textCoords, indices);
         model.setTexture(new Texture(loader.loadTexture(blocktype.getTexturePath())));
-        return new Entity(model, pos, rotation, scale, blocktype.isTransparent());
+        return new Entity(model, pos, rotation, scale, blocktype);
     }
 
     public int getNeighbour(List<Cube> allCubes) {

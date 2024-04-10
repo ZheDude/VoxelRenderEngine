@@ -1,7 +1,10 @@
 package core.Entity;
 
+import BlockData.BlockType;
+import core.TestGame;
 import org.joml.Vector3f;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -11,14 +14,14 @@ public class Entity {
     private Vector3f pos, rotation;
     private float scale;
 
-    private boolean transparent;
+    private BlockType blockType;
 
-    public Entity(Model model, Vector3f pos, Vector3f rotation, float scale, boolean transparent) {
+    public Entity(Model model, Vector3f pos, Vector3f rotation, float scale, BlockType blockType) {
         this.model = model;
         this.pos = pos;
         this.rotation = rotation;
         this.scale = scale;
-        this.transparent = transparent;
+        this.blockType = blockType;
     }
 
 
@@ -184,6 +187,13 @@ public class Entity {
         return tmin;
     }
 
+    public Vector3f calculateDirection(Vector3f targetPosition) {
+        Vector3f direction = new Vector3f(targetPosition);
+        direction.sub(this.pos); // Use the current position of this entity
+        direction.normalize();
+        return direction;
+    }
+
     public float getDistanceTo(Vector3f point) {
         return pos.distance(point);
     }
@@ -203,6 +213,21 @@ public class Entity {
     }
 
     public boolean isTransparent() {
-        return transparent;
+        return blockType.isTransparent();
+    }
+
+    public boolean isNeighborSameType(Vector3f vector3f) {
+        int c = 0;
+        for (Entity entity : TestGame.entities) {
+//            System.out.println("Entity " + c);
+//            System.out.println(entity.getPos() + " - " + new Vector3f(this.getPos()).add(vector3f));
+//            System.out.println(entity.getPos().equals(new Vector3f(this.getPos()).add(vector3f)));
+            if ((entity.getPos() == new Vector3f(this.getPos()).add(vector3f)) && entity.blockType.equals(this.blockType)) {
+//                System.out.println(entity.getPos() + " - " + new Vector3f(this.getPos()).add(vector3f));
+                return true;
+            }
+//            c++;
+        }
+        return false;
     }
 }

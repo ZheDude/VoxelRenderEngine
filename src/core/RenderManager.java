@@ -1,5 +1,6 @@
 package core;
 
+import BlockData.Cube;
 import core.Entity.Entity;
 import core.Entity.RayEntity;
 import core.Utils.Transformation;
@@ -42,13 +43,34 @@ public class RenderManager {
         glEnableVertexAttribArray(1);
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, e.getModel().getTexture().getID());
-        glDrawElements(GL_TRIANGLES, e.getModel().getVertexCount(), GL_UNSIGNED_INT, 0);
-//            glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-//            glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 6 * Integer.BYTES); // front face
-//            glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 12 * Integer.BYTES); // left face
-//            glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 18 * Integer.BYTES); // right face
-//            glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 24 * Integer.BYTES); // top face
-//            glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 30 * Integer.BYTES); // bottom face
+//        glDrawElements(GL_TRIANGLES, e.getModel().getVertexCount(), GL_UNSIGNED_INT, 0);
+
+//        System.out.printf("new Cube: current Cube Coords: %s \n------", e.getPos());
+        if (!e.isNeighborSameType(new Vector3f(-1, 0, 0))) {
+//            System.out.println("-x");
+            glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 12 * Integer.BYTES); // left face
+        }
+        if (!e.isNeighborSameType(new Vector3f(0, 1, 0))) {
+//            System.out.println("+x");
+            glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 18 * Integer.BYTES); // top face
+        }
+        if (!e.isNeighborSameType(new Vector3f(0, 0, -1))) {
+//            System.out.println("-y");
+            glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 30 * Integer.BYTES); // front face
+        }
+        if (!e.isNeighborSameType(new Vector3f(0, -1, 0))) {
+//            System.out.println("+y");
+            glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 24 * Integer.BYTES); // bottom face
+        }
+        if (!e.isNeighborSameType(new Vector3f(1, 0, 0))) {
+//            System.out.println("-z");
+            glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 6 * Integer.BYTES); // right face
+        }
+        if (!e.isNeighborSameType(new Vector3f(0, 0, 1))) {
+//            System.out.println("+z");
+            glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0); // back face
+        }
+//        System.out.println("------");
         glDisableVertexAttribArray(0);
         glDisableVertexAttribArray(1);
         glBindVertexArray(0);
@@ -79,6 +101,11 @@ public class RenderManager {
             glBindBuffer(GL_ARRAY_BUFFER, 0);
             glBindVertexArray(0);
         }
+        shader.unbind();
+    }
+
+    public void renderCrosshair(Camera camera) {
+        shader.bind();
         shader.unbind();
     }
 

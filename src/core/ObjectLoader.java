@@ -72,7 +72,11 @@ public class ObjectLoader {
     }
 
     private void bindIndicesBuffer(int[] indices) {
-        //TODO some stuff (really informative comment)
+        int vboID = glGenBuffers();
+        VBOs.add(vboID);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vboID);
+        IntBuffer buffer = Utils.storeDataInIntBuffer(indices);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, buffer, GL_STATIC_DRAW);
     }
 
     private void storeDataInAttributeList(int attributeNu, int vertexCount, float[] data) {

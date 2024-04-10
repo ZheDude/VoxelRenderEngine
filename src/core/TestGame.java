@@ -22,7 +22,8 @@ public class TestGame implements ILogic {
     private final RenderManager renderer;
     private final WindowManager window;
     private static ObjectLoader loader;
-    private static final List<Entity> entities = new ArrayList<>();
+
+    public static final List<Entity> entities = new ArrayList<>();
     private static List<RayEntity> rayEntities = new ArrayList<>();
     private static Camera camera;
     private static OctreeNode root;
@@ -72,12 +73,12 @@ public class TestGame implements ILogic {
     static Vector3f maxCorner = new Vector3f(100, 100, 100); // Adjust these values as needed
 
     public static void mouse_button_callback(long window, int button, int action, int mods) {
-        if ((button == GLFW_MOUSE_BUTTON_1 || button == GLFW_MOUSE_BUTTON_2) && action == GLFW_PRESS) {
-            // I need to figure out how to get the block that the mouse is pointing at
-            int maxRange = 5;
-            RayCasting rayCasting = new RayCasting(maxRange);
-            Vector3f ray = rayCasting.calculateRay(Main.getWindow(), camera);
-            RayEntity rayEntity = new RayEntity(loader, new Vector3f(0, 0, 0), new Vector3f(0, 0, 0), maxRange);
+        int maxRange = 5;
+        RayCasting rayCasting = new RayCasting(maxRange);
+        Vector3f ray = rayCasting.calculateRay(Main.getWindow(), camera);
+        RayEntity rayEntity = new RayEntity(loader, new Vector3f(0, 0, 0), new Vector3f(0, 0, 0), maxRange);
+
+        if ((button == GLFW_MOUSE_BUTTON_1) && action == GLFW_PRESS) {
             rayEntity.setOrigin(rayCasting.getRayOrigin());
             rayEntity.setDirection(rayCasting.getRayDirection());
             rayEntities.clear();
@@ -85,15 +86,68 @@ public class TestGame implements ILogic {
             System.out.println(rayCasting);
 
             Entity closestEntity = root.intersectRay(rayCasting.getRayOrigin(), rayCasting.getRayDirection());
+
             if (closestEntity != null) {
                 Vector3f entityPosition = closestEntity.getPos();
-                System.out.println(entityPosition);
+                System.out.println("Location of deleted block: " + entityPosition);
                 entities.remove(closestEntity);
                 // Rebuild the Octree
                 root = new OctreeNode(minCorner, maxCorner, entities);
             }
+        } else if (button == GLFW_MOUSE_BUTTON_2 && action == GLFW_PRESS) {
+            rayEntity.setOrigin(rayCasting.getRayOrigin());
+            rayEntity.setDirection(rayCasting.getRayDirection());
+            rayEntities.clear();
+            rayEntities.add(rayEntity);
+            System.out.println(rayCasting);
+
+            Entity closestEntity = root.intersectRay(rayCasting.getRayOrigin(), rayCasting.getRayDirection());
+            Vector3f placeDirection = new Vector3f(rayCasting.getRayDirection()).mul(-1);
+
+            if (closestEntity != null) {
+                Vector3f entityPosition = closestEntity.getPos();
+                Vector3f newPlaceDirection = new Vector3f(calculatePlacementDirection(placeDirection));
+                Vector3f blockPlacePosition = new Vector3f(entityPosition).add(newPlaceDirection);
+                System.out.println("Raw Direction of possible placing: " + new Vector3f(rayCasting.getRayDirection()).mul(-1));
+                System.out.println("Location of Block looking at: " + entityPosition);
+                System.out.println("Direction of possible placing: " + newPlaceDirection);
+                System.out.println("Location of possible placing: " + blockPlacePosition);
+                try {
+                    Cube c = new Cube(loader, blockPlacePosition,
+                            new Vector3f(0, 0, 0), 1,
+                            BlockType.GLASS);
+                    Entity entity = c.generateEntity();
+                    entities.add(entity);
+
+                    // Rebuild the Octree
+                    root = new OctreeNode(minCorner, maxCorner, entities);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
         }
 
+    }
+
+    public static Vector3f calculatePlacementDirection(Vector3f direction) {
+        Vector3f placementDirection = new Vector3f();
+
+        float absX = Math.abs(direction.x);
+        float absY = Math.abs(direction.y);
+        float absZ = Math.abs(direction.z);
+
+        if (absX > absY && absX > absZ) {
+            placementDirection.x = Math.round(direction.x);
+            System.out.println("X: {absX: " + absX + ", absY: " + absY + ", absZ: " + absZ + "} ");
+        } else if (absY > absX && absY > absZ) {
+            placementDirection.y = Math.round(direction.y);
+            System.out.println("Y: {absX: " + absX + ", absY: " + absY + ", absZ: " + absZ + "} ");
+        } else {
+            placementDirection.z = Math.round(direction.z);
+            System.out.println("Z: {absX: " + absX + ", absY: " + absY + ", absZ: " + absZ + "} ");
+        }
+
+        return placementDirection;
     }
 
     @Override
@@ -104,14 +158,14 @@ public class TestGame implements ILogic {
         BlockType blockType = BlockType.GLASS;
 
         // Populate the Octree with entities
-        for (int i = 0; i < 20; i++) {
-            for (int j = 0; j < 20; j++) {
-                for (int k = 0; k < 20; k++) {
+        for (int i = 0; i < 2; i++) {
+            for (int j = 0; j < 2; j++) {
+                for (int k = 0; k < 2; k++) {
                     Cube c = new Cube(loader, new Vector3f(i, k, -j), new Vector3f(0, 0, 0), 1, blockType);
                     Entity entity = c.generateEntity();
                     entities.add(entity);
                     root.addEntity(entity);
-                    blockType = blockType == BlockType.GLASS ? BlockType.DIRT : BlockType.GLASS;
+//                    blockType = blockType == BlockType.GLASS ? BlockType.DIRT : BlockType.GLASS;
                 }
             }
         }

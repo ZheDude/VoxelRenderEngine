@@ -10,7 +10,9 @@ import org.joml.Vector3f;
 import org.lwjgl.glfw.GLFW;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.lwjgl.opengl.GL46.*;
 import static org.lwjgl.glfw.GLFW.*;
@@ -23,7 +25,8 @@ public class TestGame implements ILogic {
     private final WindowManager window;
     private static ObjectLoader loader;
 
-    public static final List<Entity> entities = new ArrayList<>();
+    public static Map<Vector3f, Entity> world = new HashMap<>();
+//    public static final List<Entity> entities = new ArrayList<>();
     private static List<RayEntity> rayEntities = new ArrayList<>();
     private static Camera camera;
     private static OctreeNode root;
@@ -90,9 +93,9 @@ public class TestGame implements ILogic {
             if (closestEntity != null) {
                 Vector3f entityPosition = closestEntity.getPos();
                 System.out.println("Location of deleted block: " + entityPosition);
-                entities.remove(closestEntity);
+                world.remove(closestEntity.getPos());
                 // Rebuild the Octree
-                root = new OctreeNode(minCorner, maxCorner, entities);
+                root = new OctreeNode(minCorner, maxCorner, world);
             }
         } else if (button == GLFW_MOUSE_BUTTON_2 && action == GLFW_PRESS) {
             rayEntity.setOrigin(rayCasting.getRayOrigin());
@@ -117,10 +120,10 @@ public class TestGame implements ILogic {
                             new Vector3f(0, 0, 0), 1,
                             BlockType.GLASS);
                     Entity entity = c.generateEntity();
-                    entities.add(entity);
+                    world.put(entity.getPos(), entity);
 
                     // Rebuild the Octree
-                    root = new OctreeNode(minCorner, maxCorner, entities);
+                    root = new OctreeNode(minCorner, maxCorner, world);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -153,17 +156,17 @@ public class TestGame implements ILogic {
     @Override
     public void init() throws Exception {
         renderer.init();
-        root = new OctreeNode(minCorner, maxCorner, new ArrayList<>());
+        root = new OctreeNode(minCorner, maxCorner, new HashMap<>());
 
         BlockType blockType = BlockType.GLASS;
 
         // Populate the Octree with entities
-        for (int i = 0; i < 3; i++) {
-            for (int j = 0; j < 3; j++) {
-                for (int k = 0; k < 3; k++) {
+        for (int i = 0; i < 20; i++) {
+            for (int j = 0; j < 20; j++) {
+                for (int k = 0; k < 10; k++) {
                     Cube c = new Cube(loader, new Vector3f(i, k, -j), new Vector3f(0, 0, 0), 1, blockType);
                     Entity entity = c.generateEntity();
-                    entities.add(entity);
+                    world.put(entity.getPos(), entity);
                     root.addEntity(entity);
 //                    blockType = blockType == BlockType.GLASS ? BlockType.DIRT : BlockType.GLASS;
                 }
@@ -210,7 +213,7 @@ public class TestGame implements ILogic {
         camera.movePosition(cameraInc.x * CAMERA_MOVE_SPEED * frameTime,
                 cameraInc.y * CAMERA_MOVE_SPEED * frameTime,
                 cameraInc.z * CAMERA_MOVE_SPEED * frameTime);
-        entities.forEach(e -> e.incRotation(0.0f, 0.0f, 0.0f));
+        world.values().forEach(e -> e.incRotation(0.0f, 0.0f, 0.0f));
     }
 
     @Override
@@ -223,21 +226,21 @@ public class TestGame implements ILogic {
         window.setClearColor(0.0f, 0.0f, 0.0f, 0.0f);
         renderer.clear();
         // Sort entities based on distance from camera
-        entities.sort((e1, e2) -> {
-            float dist1 = camera.getPosition().distance(e1.getPos());
-            float dist2 = camera.getPosition().distance(e2.getPos());
-            return Float.compare(dist2, dist1); // Draw farthest entities first
-        });
+//        entityMap.values().sort((e1, e2) -> {
+//            float dist1 = camera.getPosition().distance(e1.getPos());
+//            float dist2 = camera.getPosition().distance(e2.getPos());
+//            return Float.compare(dist2, dist1); // Draw farthest entities first
+//        });
 
         // Draw opaque entities first
-        for (Entity entity : entities) {
+        for (Entity entity : world.values()) {
             if (!entity.isTransparent()) {
                 renderer.renderCubes(entity, camera);
             }
         }
 
         // Draw transparent entities last
-        for (Entity entity : entities) {
+        for (Entity entity : world.values()) {
             if (entity.isTransparent()) {
                 renderer.renderCubes(entity, camera);
             }

@@ -45,32 +45,24 @@ public class RenderManager {
         glBindTexture(GL_TEXTURE_2D, e.getModel().getTexture().getID());
 //        glDrawElements(GL_TRIANGLES, e.getModel().getVertexCount(), GL_UNSIGNED_INT, 0);
 
-//        System.out.printf("new Cube: current Cube Coords: %s \n------", e.getPos());
         if (!e.isNeighborSameType(new Vector3f(-1, 0, 0))) {
-//            System.out.println("-x");
             glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 12 * Integer.BYTES); // left face
         }
         if (!e.isNeighborSameType(new Vector3f(0, 1, 0))) {
-//            System.out.println("+y");
             glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 18 * Integer.BYTES); // top face
         }
         if (!e.isNeighborSameType(new Vector3f(0, 0, 1))) {
-//            System.out.println("-z");
             glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 30 * Integer.BYTES); // front face
         }
         if (!e.isNeighborSameType(new Vector3f(0, -1, 0))) {
-//            System.out.println("-y");
             glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 24 * Integer.BYTES); // bottom face
         }
         if (!e.isNeighborSameType(new Vector3f(1, 0, 0))) {
-//            System.out.println("+x");
             glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 6 * Integer.BYTES); // right face
         }
         if (!e.isNeighborSameType(new Vector3f(0, 0, -1))) {
-//            System.out.println("+z");
             glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0); // back face
         }
-//        System.out.println("------");
         glDisableVertexAttribArray(0);
         glDisableVertexAttribArray(1);
         glBindVertexArray(0);

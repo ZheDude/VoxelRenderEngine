@@ -67,23 +67,23 @@ public class Cube {
     };
 
 //    float[] vertices = new float[]{
-//            -0.5f, -0.5f, -0.5f, // 0: bottom-left-back
-//            0.5f, -0.5f, -0.5f, // 1: bottom-right-back
-//            -0.5f, 0.5f, -0.5f, // 2: top-left-back
-//            0.5f, 0.5f, -0.5f, // 3: top-right-back
-//            -0.5f, -0.5f, 0.5f, // 4: bottom-left-front
-//            0.5f, -0.5f, 0.5f, // 5: bottom-right-front
-//            -0.5f, 0.5f, 0.5f, // 6: top-left-front
-//            0.5f, 0.5f, 0.5f, // 7: top-right-front
+//            -0.5f, -0.5f, -0.5f, // 0: back-bottom-left     ---
+//            0.5f, -0.5f, -0.5f, // 1: back-bottom-right     +--
+//            -0.5f, 0.5f, -0.5f, // 2: back-top-left         -+-
+//            0.5f, 0.5f, -0.5f, // 3: back-top-right         ++-
+//            -0.5f, -0.5f, 0.5f, // 4: front-bottom-left     --+
+//            0.5f, -0.5f, 0.5f, // 5: front-bottom-right     +-+
+//            -0.5f, 0.5f, 0.5f, // 6: front-top-left         -++
+//            0.5f, 0.5f, 0.5f, // 7: front-top-right         +++
 //    };
 //
 //    int[] indices = new int[]{
-//            0, 2, 1, 1, 2, 3, // back face
-//            4, 5, 6, 5, 7, 6, // front face
-//            0, 4, 2, 2, 4, 6, // left face
-//            1, 3, 5, 3, 7, 5, // right face
-//            2, 6, 3, 3, 6, 7, // top face
-//            0, 1, 4, 1, 5, 4  // bottom face
+//            2, 3, 0, 3, 1, 0, // back face
+//            7, 5, 3, 3, 5, 1, // right face
+//            6, 2, 4, 2, 0, 4, // left face
+//            6, 7, 2, 7, 3, 2, // top face
+//            4, 0, 2, 2, 0, 1, // bottom face
+//            6, 4, 7, 7, 4, 5, // front face
 //    };
 
     float[] textCoords = new float[]{
@@ -128,31 +128,6 @@ public class Cube {
         Model model = loader.loadModel(vertices, textCoords, indices);
         model.setTexture(new Texture(loader.loadTexture(blocktype.getTexturePath())));
         return new Entity(model, pos, rotation, scale, blocktype);
-    }
-
-    public int getNeighbour(List<Cube> allCubes) {
-        System.out.println(this.pos);
-        int neighbourCount = 0;
-
-        //generate the coordinates of the 6 neighbors of each face
-        Vector3f[] neighbours = new Vector3f[]{
-                new Vector3f(this.pos.x, this.pos.y, this.pos.z + 1), //front face
-                new Vector3f(this.pos.x, this.pos.y, this.pos.z - 1), //back face
-                new Vector3f(this.pos.x + 1, this.pos.y, this.pos.z), //right face
-                new Vector3f(this.pos.x - 1, this.pos.y, this.pos.z), //left face
-                new Vector3f(this.pos.x, this.pos.y + 1, this.pos.z), //top face
-                new Vector3f(this.pos.x, this.pos.y - 1, this.pos.z), //bottom face
-        };
-
-        //check if the coordinates are in the list of all cubes
-        for (Vector3f neighbour : neighbours) {
-            for (Cube cube : allCubes) {
-                if (cube.pos.equals(neighbour)) {
-                    neighbourCount++;
-                }
-            }
-        }
-        return neighbourCount;
     }
 
     @Override

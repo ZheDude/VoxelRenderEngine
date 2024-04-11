@@ -4,22 +4,24 @@ import core.Entity.Entity;
 import org.joml.Vector3f;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class OctreeNode {
     private final Vector3f minCorner;
     private final Vector3f maxCorner;
-    private final List<Entity> entities;
+    private Map<Vector3f, Entity> entityMap = new HashMap<>();
     private final OctreeNode[] children;
 
     private final int  maxRange = 5; // Adjust this value as needed
 
     private static final int MAX_ENTITIES_PER_NODE = 10; // Adjust this value as needed
 
-    public OctreeNode(Vector3f minCorner, Vector3f maxCorner, List<Entity> entities) {
+    public OctreeNode(Vector3f minCorner, Vector3f maxCorner, Map<Vector3f, Entity> entityMap) {
         this.minCorner = minCorner;
         this.maxCorner = maxCorner;
-        this.entities = entities;
+        this.entityMap = entityMap;
         this.children = new OctreeNode[8];
     }
 
@@ -45,10 +47,10 @@ public class OctreeNode {
             );
 
             // Filter the entities that intersect the child's cube
-            List<Entity> childEntities = new ArrayList<>();
-            for (Entity entity : entities) {
+            Map<Vector3f, Entity> childEntities = new HashMap<>();
+            for (Entity entity : entityMap.values()) {
                 if (entity.intersectsCube(childMinCorner, childMaxCorner)) {
-                    childEntities.add(entity);
+                    childEntities.put(entity.getPos(), entity);
                 }
             }
 
@@ -59,7 +61,7 @@ public class OctreeNode {
         }
 
         // Clear the entities from this node
-        entities.clear();
+        entityMap.clear();
     }
 
     public Entity intersectRay(Vector3f rayOrigin, Vector3f rayDirection) {
@@ -70,7 +72,7 @@ public class OctreeNode {
         Entity closestEntity = null;
         float closestDistance = Float.MAX_VALUE;
 
-        for (Entity entity : entities) {
+        for (Entity entity : entityMap.values()) {
             float distance = entity.intersectRay(rayOrigin, rayDirection);
             if (distance >= 0 && distance < closestDistance && distance < maxRange) {
                 closestEntity = entity;
@@ -151,6 +153,6 @@ public class OctreeNode {
     }
 
     public void addEntity(Entity entity) {
-        entities.add(entity);
+        entityMap.put(entity.getPos(), entity);
     }
 }

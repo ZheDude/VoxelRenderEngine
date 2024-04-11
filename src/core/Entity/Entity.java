@@ -4,7 +4,6 @@ import BlockData.BlockType;
 import core.TestGame;
 import org.joml.Vector3f;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -217,17 +216,7 @@ public class Entity {
     }
 
     public boolean isNeighborSameType(Vector3f vector3f) {
-        int c = 0;
-        for (Entity entity : TestGame.entities) {
-//            System.out.println("Entity " + c);
-//            System.out.println(entity.getPos() + " - " + new Vector3f(this.getPos()).add(vector3f));
-//            System.out.println(entity.getPos().equals(new Vector3f(this.getPos()).add(vector3f)));
-            if (entity.getPos().equals(new Vector3f(this.getPos()).add(vector3f)) && entity.blockType.equals(this.blockType)) {
-//                System.out.println(entity.getPos() + " - " + new Vector3f(this.getPos()).add(vector3f));
-                return true;
-            }
-//            c++;
-        }
-        return false;
+        Entity neighbor = TestGame.world.get(new Vector3f(this.getPos()).add(vector3f));
+        return neighbor != null && neighbor.blockType.equals(this.blockType);
     }
 }

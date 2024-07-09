@@ -26,7 +26,7 @@ public class TestGame implements ILogic {
     private static ObjectLoader loader;
 
     public static Map<Vector3f, Entity> world = new HashMap<>();
-//    public static final List<Entity> entities = new ArrayList<>();
+    //    public static final List<Entity> entities = new ArrayList<>();
     private static List<RayEntity> rayEntities = new ArrayList<>();
     private static Camera camera;
     private static OctreeNode root;
@@ -118,7 +118,7 @@ public class TestGame implements ILogic {
                 try {
                     Cube c = new Cube(loader, blockPlacePosition,
                             new Vector3f(0, 0, 0), 1,
-                            BlockType.GLASS);
+                            BlockType.DIRT);
                     Entity entity = c.generateEntity();
                     world.put(entity.getPos(), entity);
 
@@ -158,13 +158,10 @@ public class TestGame implements ILogic {
         renderer.init();
         root = new OctreeNode(minCorner, maxCorner, new HashMap<>());
 
-        BlockType blockType = BlockType.GLASS;
-
-        // Populate the Octree with entities
-        for (int i = 0; i < 20; i++) {
-            for (int j = 0; j < 20; j++) {
-                for (int k = 0; k < 10; k++) {
-                    Cube c = new Cube(loader, new Vector3f(i, k, -j), new Vector3f(0, 0, 0), 1, blockType);
+        for (int i = 0; i < 1; i++) {
+            for (int j = 0; j < 1; j++) {
+                for (int k = 0; k < 1; k++) {
+                    Cube c = new Cube(loader, new Vector3f(i, k, -j), new Vector3f(0, 0, 0), 1, BlockType.GLASS);
                     Entity entity = c.generateEntity();
                     world.put(entity.getPos(), entity);
                     root.addEntity(entity);
@@ -172,8 +169,6 @@ public class TestGame implements ILogic {
                 }
             }
         }
-
-        // Subdivide the Octree
         root.subdivide();
     }
 

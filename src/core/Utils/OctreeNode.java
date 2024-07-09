@@ -155,4 +155,8 @@ public class OctreeNode {
     public void addEntity(Entity entity) {
         entityMap.put(entity.getPos(), entity);
     }
+
+    public Entity getEntity(Vector3f pos) {
+        return entityMap.get(pos);
+    }
 }

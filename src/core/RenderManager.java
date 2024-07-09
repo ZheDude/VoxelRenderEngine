@@ -7,6 +7,7 @@ import core.Utils.Transformation;
 import core.Utils.Utils;
 import org.joml.Vector3f;
 
+import java.nio.ByteBuffer;
 import java.util.List;
 
 import static org.lwjgl.opengl.GL46.*;
@@ -31,22 +32,19 @@ public class RenderManager {
     }
 
     public void renderCubes(Entity e, Camera camera) {
-//        clear();
         shader.bind();
         shader.setUniform("textureSampler", 0);
         shader.setUniform("projectionMatrix", window.updateProjectionMatrix());
         shader.setUniform("viewMatrix", Transformation.getViewMatrix(camera));
-//        for (Entity e : entity) {
         shader.setUniform("transformationMatrix", Transformation.createTransformationMatrix(e));
         glBindVertexArray(e.getModel().getVaoID());
         glEnableVertexAttribArray(0);
         glEnableVertexAttribArray(1);
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, e.getModel().getTexture().getID());
-//        glDrawElements(GL_TRIANGLES, e.getModel().getVertexCount(), GL_UNSIGNED_INT, 0);
 
         if (!e.isNeighborSameType(new Vector3f(-1, 0, 0))) {
-            glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 12 * Integer.BYTES); // left face
+            glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 12 * Integer.BYTES);
         }
         if (!e.isNeighborSameType(new Vector3f(0, 1, 0))) {
             glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 18 * Integer.BYTES); // top face
@@ -66,7 +64,6 @@ public class RenderManager {
         glDisableVertexAttribArray(0);
         glDisableVertexAttribArray(1);
         glBindVertexArray(0);
-//        }
         shader.unbind();
     }
 

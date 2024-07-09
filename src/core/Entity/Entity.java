@@ -14,6 +14,8 @@ public class Entity {
     private float scale;
 
     private BlockType blockType;
+    private Vector3f tempVector = new Vector3f(); // Temporary vector for calculations
+
 
     public Entity(Model model, Vector3f pos, Vector3f rotation, float scale, BlockType blockType) {
         this.model = model;
@@ -31,7 +33,6 @@ public class Entity {
                 this.pos.z - this.scale / 2
         );
     }
-
     public Vector3f getMaxCorner() {
         return new Vector3f(
                 this.pos.x + this.scale / 2,
@@ -39,61 +40,48 @@ public class Entity {
                 this.pos.z + this.scale / 2
         );
     }
-
-
     public void incPos(float x, float y, float z) {
         this.pos.y += y;
         this.pos.x += x;
         this.pos.z += z;
     }
-
     public void setPos(float x, float y, float z) {
         this.pos.y = y;
         this.pos.x = x;
         this.pos.z = z;
     }
-
     public void setPos(Vector3f pos) {
         this.pos.y = pos.y;
         this.pos.x = pos.x;
         this.pos.z = pos.z;
     }
-
-
     public void incRotation(float x, float y, float z) {
         this.rotation.y += y;
         this.rotation.x += x;
         this.rotation.z += z;
     }
-
     public void setRotation(float x, float y, float z) {
         this.rotation.y = y;
         this.rotation.x = x;
         this.rotation.z = z;
     }
-
     public void setRotation(Vector3f rotation) {
         this.rotation.y = rotation.y;
         this.rotation.x = rotation.x;
         this.rotation.z = rotation.z;
     }
-
     public Model getModel() {
         return model;
     }
-
     public Vector3f getPos() {
         return pos;
     }
-
     public Vector3f getRotation() {
         return rotation;
     }
-
     public float getScale() {
         return scale;
     }
-
     public int getNeighbour(List<Entity> allCubes) {
         int neighbourCount = 0;
         //generate the coordinates of the 6 neighbors of each face
@@ -117,8 +105,6 @@ public class Entity {
 //        System.out.println(neighbourCount);
         return neighbourCount;
     }
-
-    // In Entity.java
     public boolean intersectsCube(Vector3f minCorner, Vector3f maxCorner) {
         Vector3f entityMinCorner = getMinCorner();
         Vector3f entityMaxCorner = getMaxCorner();
@@ -188,7 +174,7 @@ public class Entity {
 
     public Vector3f calculateDirection(Vector3f targetPosition) {
         Vector3f direction = new Vector3f(targetPosition);
-        direction.sub(this.pos); // Use the current position of this entity
+        direction.sub(this.pos);
         direction.normalize();
         return direction;
     }
@@ -216,7 +202,8 @@ public class Entity {
     }
 
     public boolean isNeighborSameType(Vector3f vector3f) {
-        Entity neighbor = TestGame.world.get(new Vector3f(this.getPos()).add(vector3f));
+        tempVector.set(this.getPos()).add(vector3f);
+        Entity neighbor = TestGame.world.get(tempVector);
         return neighbor != null && neighbor.blockType.equals(this.blockType);
     }
 }

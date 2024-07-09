@@ -80,7 +80,7 @@ public class WindowManager {
 
         glfwMakeContextCurrent(window);
 
-
+        System.out.println(isvSync());
         if (isvSync()) glfwSwapInterval(1);
 
         glfwShowWindow(window);

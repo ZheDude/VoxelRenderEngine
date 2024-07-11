@@ -1,14 +1,12 @@
 package core;
 
-import BlockData.Cube;
 import core.Entity.Entity;
-import core.Entity.RayEntity;
 import core.Utils.Transformation;
 import core.Utils.Utils;
 import org.joml.Vector3f;
 
-import java.nio.ByteBuffer;
 import java.util.List;
+import java.util.Set;
 
 import static org.lwjgl.opengl.GL46.*;
 
@@ -43,6 +41,26 @@ public class RenderManager {
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, e.getModel().getTexture().getID());
 
+//        Set<Integer> sameTypeFaces = e.getFacesWithSameTypeNeighbors();
+//        if (!sameTypeFaces.contains(12)) {
+//            glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 12 * Integer.BYTES);
+//        }
+//        if (!sameTypeFaces.contains(18)) {
+//            glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 18 * Integer.BYTES); // top face
+//        }
+//        if (!sameTypeFaces.contains(30)) {
+//            glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 30 * Integer.BYTES); // top face
+//        }
+//        if (!sameTypeFaces.contains(24)) {
+//            glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 24 * Integer.BYTES); // top face
+//        }
+//        if (!sameTypeFaces.contains(6)) {
+//            glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 6 * Integer.BYTES); // top face
+//        }
+//        if (!sameTypeFaces.contains(0)) {
+//            glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0 * Integer.BYTES); // top face
+//        }
+
         if (!e.isNeighborSameType(new Vector3f(-1, 0, 0))) {
             glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 12 * Integer.BYTES);
         }
@@ -64,32 +82,6 @@ public class RenderManager {
         glDisableVertexAttribArray(0);
         glDisableVertexAttribArray(1);
         glBindVertexArray(0);
-        shader.unbind();
-    }
-
-    public void renderRays(List<RayEntity> rays, Camera camera) {
-        shader.bind();
-        shader.setUniform("projectionMatrix", window.updateProjectionMatrix());
-        shader.setUniform("viewMatrix", Transformation.getViewMatrix(camera));
-        for (RayEntity ray : rays) {
-            shader.setUniform("transformationMatrix", Transformation.createTransformationMatrix(ray.getOrigin(), new Vector3f(0, 0, 0), 1));
-            Vector3f normalizedDirection = new Vector3f(ray.getDirection()).normalize();
-            float[] vertices = new float[]{
-                    0f, 0f, 0f,
-                    normalizedDirection.x * ray.maxRange, normalizedDirection.y * ray.maxRange, normalizedDirection.z * ray.maxRange
-            };
-            int vaoID = glGenVertexArrays();
-            glBindVertexArray(vaoID);
-            int vboID = glGenBuffers();
-            glBindBuffer(GL_ARRAY_BUFFER, vboID);
-            glBufferData(GL_ARRAY_BUFFER, vertices, GL_STATIC_DRAW);
-            glVertexAttribPointer(0, 3, GL_FLOAT, false, 0, 0);
-            glEnableVertexAttribArray(0);
-            glDrawArrays(GL_LINES, 0, 2);
-            glDisableVertexAttribArray(0);
-            glBindBuffer(GL_ARRAY_BUFFER, 0);
-            glBindVertexArray(0);
-        }
         shader.unbind();
     }
 

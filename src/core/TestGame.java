@@ -3,9 +3,6 @@ package core;
 import BlockData.BlockType;
 import BlockData.Cube;
 import core.Entity.Entity;
-import core.Entity.RayEntity;
-import core.Utils.OctreeNode;
-import core.Utils.RayCasting;
 import org.joml.Vector3f;
 import org.lwjgl.glfw.GLFW;
 
@@ -27,9 +24,7 @@ public class TestGame implements ILogic {
 
     public static Map<Vector3f, Entity> world = new HashMap<>();
     //    public static final List<Entity> entities = new ArrayList<>();
-    private static List<RayEntity> rayEntities = new ArrayList<>();
     private static Camera camera;
-    private static OctreeNode root;
     private static float sensitivity = 0.1f;
     Vector3f cameraInc;
 
@@ -76,100 +71,29 @@ public class TestGame implements ILogic {
     static Vector3f maxCorner = new Vector3f(100, 100, 100); // Adjust these values as needed
 
     public static void mouse_button_callback(long window, int button, int action, int mods) {
-        int maxRange = 5;
-        RayCasting rayCasting = new RayCasting(maxRange);
-        Vector3f ray = rayCasting.calculateRay(Main.getWindow(), camera);
-        RayEntity rayEntity = new RayEntity(loader, new Vector3f(0, 0, 0), new Vector3f(0, 0, 0), maxRange);
 
         if ((button == GLFW_MOUSE_BUTTON_1) && action == GLFW_PRESS) {
-            rayEntity.setOrigin(rayCasting.getRayOrigin());
-            rayEntity.setDirection(rayCasting.getRayDirection());
-            rayEntities.clear();
-            rayEntities.add(rayEntity);
-            System.out.println(rayCasting);
-
-            Entity closestEntity = root.intersectRay(rayCasting.getRayOrigin(), rayCasting.getRayDirection());
-
-            if (closestEntity != null) {
-                Vector3f entityPosition = closestEntity.getPos();
-                System.out.println("Location of deleted block: " + entityPosition);
-                world.remove(closestEntity.getPos());
-                // Rebuild the Octree
-                root = new OctreeNode(minCorner, maxCorner, world);
-            }
+            //TODO:
         } else if (button == GLFW_MOUSE_BUTTON_2 && action == GLFW_PRESS) {
-            rayEntity.setOrigin(rayCasting.getRayOrigin());
-            rayEntity.setDirection(rayCasting.getRayDirection());
-            rayEntities.clear();
-            rayEntities.add(rayEntity);
-            System.out.println(rayCasting);
-
-            Entity closestEntity = root.intersectRay(rayCasting.getRayOrigin(), rayCasting.getRayDirection());
-            Vector3f placeDirection = new Vector3f(rayCasting.getRayDirection()).mul(-1);
-
-            if (closestEntity != null) {
-                Vector3f entityPosition = closestEntity.getPos();
-                Vector3f newPlaceDirection = new Vector3f(calculatePlacementDirection(placeDirection));
-                Vector3f blockPlacePosition = new Vector3f(entityPosition).add(newPlaceDirection);
-                System.out.println("Raw Direction of possible placing: " + new Vector3f(rayCasting.getRayDirection()).mul(-1));
-                System.out.println("Location of Block looking at: " + entityPosition);
-                System.out.println("Direction of possible placing: " + newPlaceDirection);
-                System.out.println("Location of possible placing: " + blockPlacePosition);
-                try {
-                    Cube c = new Cube(loader, blockPlacePosition,
-                            new Vector3f(0, 0, 0), 1,
-                            BlockType.DIRT);
-                    Entity entity = c.generateEntity();
-                    world.put(entity.getPos(), entity);
-
-                    // Rebuild the Octree
-                    root = new OctreeNode(minCorner, maxCorner, world);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
+            //TODO:
         }
 
-    }
-
-    public static Vector3f calculatePlacementDirection(Vector3f direction) {
-        Vector3f placementDirection = new Vector3f();
-
-        float absX = Math.abs(direction.x);
-        float absY = Math.abs(direction.y);
-        float absZ = Math.abs(direction.z);
-
-        if (absX > absY && absX > absZ) {
-            placementDirection.x = Math.round(direction.x);
-            System.out.println("X: {absX: " + absX + ", absY: " + absY + ", absZ: " + absZ + "} ");
-        } else if (absY > absX && absY > absZ) {
-            placementDirection.y = Math.round(direction.y);
-            System.out.println("Y: {absX: " + absX + ", absY: " + absY + ", absZ: " + absZ + "} ");
-        } else {
-            placementDirection.z = Math.round(direction.z);
-            System.out.println("Z: {absX: " + absX + ", absY: " + absY + ", absZ: " + absZ + "} ");
-        }
-
-        return placementDirection;
     }
 
     @Override
     public void init() throws Exception {
         renderer.init();
-        root = new OctreeNode(minCorner, maxCorner, new HashMap<>());
 
-        for (int i = 0; i < 1; i++) {
-            for (int j = 0; j < 1; j++) {
-                for (int k = 0; k < 1; k++) {
+        for (int i = 0; i < 31; i++) {
+            for (int j = 0; j < 31; j++) {
+                for (int k = 0; k < 31; k++) {
                     Cube c = new Cube(loader, new Vector3f(i, k, -j), new Vector3f(0, 0, 0), 1, BlockType.GLASS);
                     Entity entity = c.generateEntity();
                     world.put(entity.getPos(), entity);
-                    root.addEntity(entity);
 //                    blockType = blockType == BlockType.GLASS ? BlockType.DIRT : BlockType.GLASS;
                 }
             }
         }
-        root.subdivide();
     }
 
     @Override
@@ -208,7 +132,7 @@ public class TestGame implements ILogic {
         camera.movePosition(cameraInc.x * CAMERA_MOVE_SPEED * frameTime,
                 cameraInc.y * CAMERA_MOVE_SPEED * frameTime,
                 cameraInc.z * CAMERA_MOVE_SPEED * frameTime);
-        world.values().forEach(e -> e.incRotation(0.0f, 0.0f, 0.0f));
+        //world.values().forEach(e -> e.incRotation(0.0f, 0.0f, 0.0f));
     }
 
     @Override
@@ -240,7 +164,6 @@ public class TestGame implements ILogic {
                 renderer.renderCubes(entity, camera);
             }
         }
-        renderer.renderRays(rayEntities, camera);
     }
 
     @Override

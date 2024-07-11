@@ -80,17 +80,36 @@ public class TestGame implements ILogic {
 
     }
 
+//    @Override
+//    public void init() throws Exception {
+//        renderer.init();
+//
+//        for (int i = 0; i < 31; i++) {
+//            for (int j = 0; j < 31; j++) {
+//                for (int k = 0; k < 31; k++) {
+//                    Cube c = new Cube(loader, new Vector3f(i, k, -j), new Vector3f(0, 0, 0), 1, BlockType.GLASS);
+//                    Entity entity = c.generateEntity();
+//                    world.put(entity.getPos(), entity);
+////                    blockType = blockType == BlockType.GLASS ? BlockType.DIRT : BlockType.GLASS;
+//                }
+//            }
+//        }
+//    }
+
     @Override
     public void init() throws Exception {
         renderer.init();
+        Vector3f defaultRotation = new Vector3f(0, 0, 0); // Reuse this for all cubes
 
+        Cube c = new Cube(loader, new Vector3f(0, 0, -0), defaultRotation, 1, BlockType.DIRT);
+        Entity entity = c.generateEntity();
+        // Create all cubes first
         for (int i = 0; i < 31; i++) {
             for (int j = 0; j < 31; j++) {
                 for (int k = 0; k < 31; k++) {
-                    Cube c = new Cube(loader, new Vector3f(i, k, -j), new Vector3f(0, 0, 0), 1, BlockType.GLASS);
-                    Entity entity = c.generateEntity();
-                    world.put(entity.getPos(), entity);
-//                    blockType = blockType == BlockType.GLASS ? BlockType.DIRT : BlockType.GLASS;
+                    entity.setPos(i, k, -j);
+                    Entity a = entity.clone();
+                    world.put(a.getPos(), a);
                 }
             }
         }

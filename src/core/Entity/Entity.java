@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
-public class Entity {
+public class Entity implements Cloneable{
 
     private Model model;
     private Vector3f pos, rotation;
@@ -232,5 +232,21 @@ public class Entity {
         Entity neighbor = TestGame.world.get(tempVector);
         return neighbor != null && neighbor.blockType.equals(this.blockType);
 
+    }
+
+    @Override
+    public Entity clone() {
+        try {
+            Entity clone = (Entity) super.clone();
+            // Ensure deep copy for mutable fields
+            clone.pos = new Vector3f(this.pos);
+            clone.rotation = new Vector3f(this.rotation);
+            // For immutable fields or primitives, a shallow copy is sufficient
+            // clone.scale = this.scale;
+            // clone.blockType = this.blockType;
+            return clone;
+        } catch (CloneNotSupportedException e) {
+            throw new AssertionError(); // Can never happen
+        }
     }
 }

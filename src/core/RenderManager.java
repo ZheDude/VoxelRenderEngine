@@ -41,44 +41,8 @@ public class RenderManager {
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, e.getModel().getTexture().getID());
 
-//        Set<Integer> sameTypeFaces = e.getFacesWithSameTypeNeighbors();
-//        if (!sameTypeFaces.contains(12)) {
-//            glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 12 * Integer.BYTES);
-//        }
-//        if (!sameTypeFaces.contains(18)) {
-//            glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 18 * Integer.BYTES); // top face
-//        }
-//        if (!sameTypeFaces.contains(30)) {
-//            glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 30 * Integer.BYTES); // top face
-//        }
-//        if (!sameTypeFaces.contains(24)) {
-//            glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 24 * Integer.BYTES); // top face
-//        }
-//        if (!sameTypeFaces.contains(6)) {
-//            glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 6 * Integer.BYTES); // top face
-//        }
-//        if (!sameTypeFaces.contains(0)) {
-//            glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0 * Integer.BYTES); // top face
-//        }
+        glDrawElements(GL_TRIANGLES, e.getModel().getVertexCount(), GL_UNSIGNED_INT, 0);
 
-        if (!e.isNeighborSameType(new Vector3f(-1, 0, 0))) {
-            glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 12 * Integer.BYTES);
-        }
-        if (!e.isNeighborSameType(new Vector3f(0, 1, 0))) {
-            glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 18 * Integer.BYTES); // top face
-        }
-        if (!e.isNeighborSameType(new Vector3f(0, 0, 1))) {
-            glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 30 * Integer.BYTES); // front face
-        }
-        if (!e.isNeighborSameType(new Vector3f(0, -1, 0))) {
-            glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 24 * Integer.BYTES); // bottom face
-        }
-        if (!e.isNeighborSameType(new Vector3f(1, 0, 0))) {
-            glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 6 * Integer.BYTES); // right face
-        }
-        if (!e.isNeighborSameType(new Vector3f(0, 0, -1))) {
-            glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0); // back face
-        }
         glDisableVertexAttribArray(0);
         glDisableVertexAttribArray(1);
         glBindVertexArray(0);

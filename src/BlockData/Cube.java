@@ -16,7 +16,7 @@ public class Cube {
     private final ObjectLoader loader;
     private final Vector3f pos;
     private final Vector3f rotation;
-    private final float scale;
+    private Vector3f scale;
     private BlockType blocktype;
 
     float[] vertices = new float[]{
@@ -110,12 +110,20 @@ public class Cube {
 
     };
 
-    public Cube(ObjectLoader loader, Vector3f pos, Vector3f rotation, float scale, BlockType blocktype) throws Exception {
+    public Cube(ObjectLoader loader, Vector3f pos, Vector3f rotation, float scale, BlockType blockType) throws Exception {
         this.loader = loader;
         this.pos = pos;
         this.rotation = rotation;
-        this.scale = scale;
-        this.blocktype = blocktype;
+        this.scale = new Vector3f(scale, scale, scale);
+        this.blocktype = blockType;
+    }
+
+    public Cube(ObjectLoader loader, Vector3f pos, Vector3f rotation, int width, int height, int depth, BlockType blockType) {
+        this.loader = loader;
+        this.pos = pos;
+        this.rotation = rotation;
+        this.blocktype = blockType;
+        this.scale = new Vector3f(width, height, depth);
     }
 
     public void setPos(float x, float y, float z) {

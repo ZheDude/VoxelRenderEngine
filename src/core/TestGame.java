@@ -3,6 +3,7 @@ package core;
 import BlockData.BlockType;
 import BlockData.Cube;
 import core.Entity.Entity;
+import core.Utils.GreedyMeshing;
 import org.joml.Vector3f;
 import org.lwjgl.glfw.GLFW;
 
@@ -23,7 +24,7 @@ public class TestGame implements ILogic {
     private static ObjectLoader loader;
 
     public static Map<Vector3f, Entity> world = new HashMap<>();
-    //    public static final List<Entity> entities = new ArrayList<>();
+    public static Map<Vector3f, Entity> renderWorld = new HashMap<>();
     private static Camera camera;
     private static float sensitivity = 0.1f;
     Vector3f cameraInc;
@@ -67,9 +68,6 @@ public class TestGame implements ILogic {
         camera.setRotation((float) pitch, (float) yaw, 0.0f);
     }
 
-    static Vector3f minCorner = new Vector3f(-100, -100, -100); // Adjust these values as needed
-    static Vector3f maxCorner = new Vector3f(100, 100, 100); // Adjust these values as needed
-
     public static void mouse_button_callback(long window, int button, int action, int mods) {
 
         if ((button == GLFW_MOUSE_BUTTON_1) && action == GLFW_PRESS) {
@@ -80,38 +78,44 @@ public class TestGame implements ILogic {
 
     }
 
-//    @Override
-//    public void init() throws Exception {
-//        renderer.init();
-//
-//        for (int i = 0; i < 31; i++) {
-//            for (int j = 0; j < 31; j++) {
-//                for (int k = 0; k < 31; k++) {
-//                    Cube c = new Cube(loader, new Vector3f(i, k, -j), new Vector3f(0, 0, 0), 1, BlockType.GLASS);
-//                    Entity entity = c.generateEntity();
-//                    world.put(entity.getPos(), entity);
-////                    blockType = blockType == BlockType.GLASS ? BlockType.DIRT : BlockType.GLASS;
-//                }
-//            }
-//        }
-//    }
-
     @Override
     public void init() throws Exception {
         renderer.init();
+        if (window.isResize()) {
+            glViewport(0, 0, window.getWidth(), window.getHeight());
+            window.setResize(true);
+        }
+        window.setClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+
         Vector3f defaultRotation = new Vector3f(0, 0, 0); // Reuse this for all cubes
 
         Cube c = new Cube(loader, new Vector3f(0, 0, -0), defaultRotation, 1, BlockType.DIRT);
         Entity entity = c.generateEntity();
-        // Create all cubes first
-        for (int i = 0; i < 31; i++) {
-            for (int j = 0; j < 31; j++) {
-                for (int k = 0; k < 31; k++) {
+
+        for (int i = 0; i < 7; i++) {
+            for (int j = 0; j < 7; j++) {
+                for (int k = 0; k < 7; k++) {
                     entity.setPos(i, k, -j);
                     Entity a = entity.clone();
                     world.put(a.getPos(), a);
                 }
             }
+        }
+        entity.setPos(7, 6, -6);
+        world.put(entity.getPos(), entity.clone());
+        entity.setPos(7, 6, -5);
+        world.put(entity.getPos(), entity.clone());
+
+        try {
+            List<Cube> optimizedMesh = GreedyMeshing.generateMesh(world, loader);
+            for (Cube cube : optimizedMesh) {
+                Entity e = cube.generateEntity();
+                renderWorld.put(e.getPos(), e);
+            }
+            System.out.println(renderWorld);
+        } catch (Exception e){
+            e.printStackTrace();
+            // Handle exceptions appropriately
         }
     }
 
@@ -156,33 +160,33 @@ public class TestGame implements ILogic {
 
     @Override
     public void render() {
-        if (window.isResize()) {
-            glViewport(0, 0, window.getWidth(), window.getHeight());
-            window.setResize(true);
-        }
-
-        window.setClearColor(0.0f, 0.0f, 0.0f, 0.0f);
         renderer.clear();
-        // Sort entities based on distance from camera
-//        entityMap.values().sort((e1, e2) -> {
-//            float dist1 = camera.getPosition().distance(e1.getPos());
-//            float dist2 = camera.getPosition().distance(e2.getPos());
-//            return Float.compare(dist2, dist1); // Draw farthest entities first
-//        });
 
         // Draw opaque entities first
-        for (Entity entity : world.values()) {
+        for (Entity entity : renderWorld.values()) {
             if (!entity.isTransparent()) {
                 renderer.renderCubes(entity, camera);
             }
         }
 
         // Draw transparent entities last
-        for (Entity entity : world.values()) {
+        for (Entity entity : renderWorld.values()) {
             if (entity.isTransparent()) {
                 renderer.renderCubes(entity, camera);
             }
         }
+
+//        for (Entity entity : world.values()) {
+//            if (!entity.isTransparent()) {
+//                renderer.renderCubes(entity, camera);
+//            }
+//        }
+//
+//        for (Entity entity : world.values()) {
+//            if (entity.isTransparent()) {
+//                renderer.renderCubes(entity, camera);
+//            }
+//        }
     }
 
     @Override

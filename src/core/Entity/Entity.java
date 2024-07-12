@@ -13,13 +13,13 @@ public class Entity implements Cloneable{
 
     private Model model;
     private Vector3f pos, rotation;
-    private float scale;
+    private Vector3f scale;
 
-    private BlockType blockType;
+    public BlockType blockType;
     private Vector3f tempVector = new Vector3f(); // Temporary vector for calculations
 
 
-    public Entity(Model model, Vector3f pos, Vector3f rotation, float scale, BlockType blockType) {
+    public Entity(Model model, Vector3f pos, Vector3f rotation, Vector3f scale, BlockType blockType) {
         this.model = model;
         this.pos = pos;
         this.rotation = rotation;
@@ -30,16 +30,16 @@ public class Entity implements Cloneable{
 
     public Vector3f getMinCorner() {
         return new Vector3f(
-                this.pos.x - this.scale / 2,
-                this.pos.y - this.scale / 2,
-                this.pos.z - this.scale / 2
+                this.pos.x - this.scale.x / 2,
+                this.pos.y - this.scale.y / 2,
+                this.pos.z - this.scale.z / 2
         );
     }
     public Vector3f getMaxCorner() {
         return new Vector3f(
-                this.pos.x + this.scale / 2,
-                this.pos.y + this.scale / 2,
-                this.pos.z + this.scale / 2
+                this.pos.x + this.scale.x / 2,
+                this.pos.y + this.scale.y / 2,
+                this.pos.z + this.scale.z / 2
         );
     }
     public void incPos(float x, float y, float z) {
@@ -81,7 +81,7 @@ public class Entity implements Cloneable{
     public Vector3f getRotation() {
         return rotation;
     }
-    public float getScale() {
+    public Vector3f getScale() {
         return scale;
     }
     public int getNeighbour(List<Entity> allCubes) {
@@ -203,33 +203,9 @@ public class Entity implements Cloneable{
         return blockType.isTransparent();
     }
 
-
-    public Set<Integer> getFacesWithSameTypeNeighbors() {
-        Vector3f[] neighborDirections = new Vector3f[]{
-                new Vector3f(-1, 0, 0), // Left face
-                new Vector3f(0, 1, 0),  // Top face
-                new Vector3f(0, 0, 1),  // Front face
-                new Vector3f(0, -1, 0), // Bottom face
-                new Vector3f(1, 0, 0),  // Right face
-                new Vector3f(0, 0, -1)  // Back face
-        };
-        Integer[] faceIndices = new Integer[]{12, 18, 30, 24, 6, 0}; // Corresponding indices for each face
-        Set<Integer> sameTypeFaces = new HashSet<>();
-
-        for (int i = 0; i < neighborDirections.length; i++) {
-            tempVector.set(this.getPos()).add(neighborDirections[i]);
-            Entity neighbor = TestGame.world.get(tempVector);
-            if (neighbor != null && neighbor.blockType.equals(this.blockType)) {
-                sameTypeFaces.add(faceIndices[i]);
-            }
-        }
-        return sameTypeFaces;
-    }
-
-
     public boolean isNeighborSameType(Vector3f vector3f) {
         tempVector.set(this.getPos()).add(vector3f);
-        Entity neighbor = TestGame.world.get(tempVector);
+        Entity neighbor = TestGame.renderWorld.get(tempVector);
         return neighbor != null && neighbor.blockType.equals(this.blockType);
 
     }
@@ -238,15 +214,13 @@ public class Entity implements Cloneable{
     public Entity clone() {
         try {
             Entity clone = (Entity) super.clone();
-            // Ensure deep copy for mutable fields
             clone.pos = new Vector3f(this.pos);
             clone.rotation = new Vector3f(this.rotation);
-            // For immutable fields or primitives, a shallow copy is sufficient
-            // clone.scale = this.scale;
-            // clone.blockType = this.blockType;
+            clone.scale = this.scale;
+            clone.blockType = this.blockType;
             return clone;
         } catch (CloneNotSupportedException e) {
-            throw new AssertionError(); // Can never happen
+            throw new AssertionError();
         }
     }
 }
